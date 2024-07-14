@@ -2,3 +2,4 @@
 .packages
 .dart_tool
 .metals
+.metals.h2.db
