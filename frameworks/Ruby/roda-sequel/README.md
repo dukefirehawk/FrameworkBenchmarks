@@ -12,12 +12,10 @@ comparing a variety of web platforms.
 
 The tests will be run with:
 
-* [Ruby 2.4](http://www.ruby-lang.org)
-* [JRuby 9.1](http://jruby.org)
-* [Rubinius 3](https://rubinius.com)\*
-* [Puma 3](http://puma.io)
-* [Passenger 5](https://www.phusionpassenger.com)
-* [Unicorn 5](https://bogomips.org/unicorn/)
+* [Ruby 3.4](http://www.ruby-lang.org)
+* [Puma 6](http://puma.io)
+* [Unicorn 6](https://bogomips.org/unicorn/)
+* [Iodine](https://github.com/boazsegev/iodine)
 * [Roda 3](http://roda.jeremyevans.net)
 * [Sequel 5](http://sequel.jeremyevans.net)
 * [Erubi 1](https://github.com/jeremyevans/erubi)

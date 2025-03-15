@@ -1,4 +1,4 @@
-use std::{borrow::Cow, collections::HashMap, fmt::Write, io, sync::Arc};
+use std::{collections::HashMap, fmt::Write, io, sync::Arc};
 
 use futures_util::{stream::FuturesUnordered, StreamExt, TryFutureExt, TryStreamExt};
 use rand::{rngs::SmallRng, thread_rng, Rng, SeedableRng};
@@ -160,21 +160,25 @@ impl PgConnection {
     }
 
     pub async fn tell_fortune(&self) -> Result<Vec<Fortune>, PgError> {
-        let mut items = self
-            .client
-            .query(&self.fortune, &[])
-            .await?
-            .iter()
-            .map(|row| Fortune {
-                id: row.get(0),
-                message: Cow::Owned(row.get(1)),
-            })
-            .collect::<Vec<_>>();
-
-        items.push(Fortune {
+        let mut items = vec![Fortune {
             id: 0,
-            message: Cow::Borrowed("Additional fortune added at request time."),
-        });
+            message: "Additional fortune added at request time.".to_string(),
+        }];
+
+        let stream = self
+            .client
+            .query_raw::<_, _, &[i32; 0]>(&self.fortune, &[])
+            .await?;
+        pin!(stream);
+
+        while let Some(row) = stream.next().await {
+            let row = row?;
+
+            items.push(Fortune {
+                id: row.get(0),
+                message: row.get(1),
+            });
+        }
 
         items.sort_by(|it, next| it.message.cmp(&next.message));
 

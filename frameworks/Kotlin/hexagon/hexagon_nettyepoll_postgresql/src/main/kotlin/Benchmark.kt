@@ -1,9 +1,10 @@
-package com.hexagonkt
+package com.hexagontk
 
-import com.hexagonkt.core.urlOf
-import com.hexagonkt.http.server.netty.epoll.NettyEpollServerAdapter
-import com.hexagonkt.store.BenchmarkSqlStore
-import com.hexagonkt.templates.rocker.RockerAdapter
+import com.hexagontk.core.media.TEXT_HTML
+import com.hexagontk.core.urlOf
+import com.hexagontk.http.server.netty.epoll.NettyEpollHttpServer
+import com.hexagontk.store.BenchmarkSqlStore
+import com.hexagontk.templates.jte.Jte
 import io.netty.util.ResourceLeakDetector
 import io.netty.util.ResourceLeakDetector.Level.DISABLED
 
@@ -15,9 +16,14 @@ fun main() {
 
     val settings = Settings()
     val store = BenchmarkSqlStore("postgresql")
-    val templateEngine = RockerAdapter()
-    val templateUrl = urlOf("classpath:fortunes.rocker.html")
-    val engine = NettyEpollServerAdapter()
+    val templateEngine = Jte(TEXT_HTML, precompiled = true)
+    val templateUrl = urlOf("classpath:fortunes.jte")
+    val engine = NettyEpollHttpServer(
+        keepAliveHandler = false,
+        httpAggregatorHandler = false,
+        chunkedHandler = false,
+        enableWebsockets = false,
+    )
 
     val benchmark = Benchmark(engine, store, templateEngine, templateUrl, settings)
     benchmark.server.start()

@@ -1,8 +1,8 @@
 {
 	"require": {
 		"yidas/yii2-composer-bower-skip": "~2.0.13",
-		"yiisoft/yii2": "~2.0.43",
-		"joanhey/adapterman": "^0.6"
+		"yiisoft/yii2": "~2.0.49",
+		"joanhey/adapterman": "^0.7"
 	},
 	"config": {
         "allow-plugins": {

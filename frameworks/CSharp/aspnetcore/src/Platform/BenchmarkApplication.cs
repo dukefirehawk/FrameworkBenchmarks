@@ -10,6 +10,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using Microsoft.Extensions.ObjectPool;
+using Platform.Templates;
 using RazorSlices;
 
 namespace PlatformBenchmarks
@@ -40,14 +41,14 @@ namespace PlatformBenchmarks
 
         public static RawDb RawDb { get; set; }
 
-        private static readonly DefaultObjectPool<ChunkedBufferWriter<WriterAdapter>> ChunkedWriterPool
+        private static readonly DefaultObjectPool<ChunkedPipeWriter> ChunkedWriterPool
             = new(new ChunkedWriterObjectPolicy());
 
-        private sealed class ChunkedWriterObjectPolicy : IPooledObjectPolicy<ChunkedBufferWriter<WriterAdapter>>
+        private sealed class ChunkedWriterObjectPolicy : IPooledObjectPolicy<ChunkedPipeWriter>
         {
-            public ChunkedBufferWriter<WriterAdapter> Create() => new();
+            public ChunkedPipeWriter Create() => new();
 
-            public bool Return(ChunkedBufferWriter<WriterAdapter> writer)
+            public bool Return(ChunkedPipeWriter writer)
             {
                 writer.Reset();
                 return true;
@@ -55,9 +56,9 @@ namespace PlatformBenchmarks
         }
 
 #if NPGSQL
-        private readonly static SliceFactory<List<FortuneUtf8>> FortunesTemplateFactory = RazorSlice.ResolveSliceFactory<List<FortuneUtf8>>("/Templates/FortunesUtf8.cshtml");
+        private readonly static Func<List<FortuneUtf8>, RazorSlice<List<FortuneUtf8>>> FortunesTemplateFactory = FortunesUtf8.Create;
 #else
-        private readonly static SliceFactory<List<FortuneUtf16>> FortunesTemplateFactory = RazorSlice.ResolveSliceFactory<List<FortuneUtf16>>("/Templates/FortunesUtf16.cshtml");
+        private readonly static Func<List<FortuneUtf16>, RazorSlice<List<FortuneUtf16>>> FortunesTemplateFactory = FortunesUtf16.Create;
 #endif
 
         [ThreadStatic]
@@ -143,16 +144,6 @@ namespace PlatformBenchmarks
             return queries;
         }
 
-        private Task ProcessRequestAsync() => _requestType switch
-        {
-            RequestType.FortunesRaw => FortunesRaw(Writer),
-            RequestType.SingleQuery => SingleQuery(Writer),
-            RequestType.Caching => Caching(Writer, _queries),
-            RequestType.Updates => Updates(Writer, _queries),
-            RequestType.MultipleQueries => MultipleQueries(Writer, _queries),
-            _ => Default(Writer)
-        };
-
         private bool ProcessRequest(ref BufferWriter<WriterAdapter> writer)
         {
             if (_requestType == RequestType.PlainText)
@@ -171,6 +162,16 @@ namespace PlatformBenchmarks
             return true;
         }
 
+        private Task ProcessRequestAsync() => _requestType switch
+        {
+            RequestType.FortunesRaw => FortunesRaw(Writer),
+            RequestType.SingleQuery => SingleQuery(Writer),
+            RequestType.Caching => Caching(Writer, _queries),
+            RequestType.Updates => Updates(Writer, _queries),
+            RequestType.MultipleQueries => MultipleQueries(Writer, _queries),
+            _ => Default(Writer)
+        };
+
         private static Task Default(PipeWriter pipeWriter)
         {
             var writer = GetWriter(pipeWriter, sizeHint: _defaultPreamble.Length + DateHeader.HeaderBytes.Length);
@@ -181,8 +182,8 @@ namespace PlatformBenchmarks
 
         private static ReadOnlySpan<byte> _defaultPreamble =>
             "HTTP/1.1 200 OK\r\n"u8 +
-            "Server: K"u8 + "\r\n"u8 +
-            "Content-Type: text/plain"u8 +
+            "Server: K\r\n"u8 +
+            "Content-Type: text/plain\r\n"u8 +
             "Content-Length: 0"u8;
 
         private static void Default(ref BufferWriter<WriterAdapter> writer)

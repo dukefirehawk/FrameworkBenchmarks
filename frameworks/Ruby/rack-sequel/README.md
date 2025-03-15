@@ -12,11 +12,9 @@ a variety of web platforms.
 
 The tests will be run with:
 
-* [Ruby 2.4](http://www.ruby-lang.org)
-* [JRuby 9.1](http://jruby.org)
-* [Rubinius 3](https://rubinius.com)\*
-* [Puma 3](http://puma.io)
-* [Passenger 5](https://www.phusionpassenger.com)
+* [Ruby 3.4](http://www.ruby-lang.org)
+* [Puma 6](http://puma.io)
+* [Passenger 6](https://www.phusionpassenger.com)
 * [Unicorn 5](https://bogomips.org/unicorn/)
 * [Rack 2](http://rack.rubyforge.org)
 * [Sequel 5](http://sequel.jeremyevans.net)

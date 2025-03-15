@@ -1,6 +1,6 @@
 # https://github.com/rbjorklin/techempower-ocaml-image
 # Use pre-built image with all dependencies for faster test times
-FROM rbjorklin/techempower-ocaml-image:4.14.1-4bf86567
+FROM rbjorklin/techempower-ocaml-image:5.3.0-e8949511
 
 ENV DIR project
 

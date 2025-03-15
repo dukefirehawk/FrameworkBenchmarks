@@ -1,7 +1,7 @@
-ARG WASMTIME_VERSION=12.0.1
-ARG WASM_TARGET=wasm32-wasi-preview1-threads
+ARG WASMTIME_VERSION=15.0.0
+ARG WASM_TARGET=wasm32-wasip1-threads
 
-FROM rust:1.67 AS compile
+FROM rust:1.85 AS compile
 
 ARG WASMTIME_VERSION
 ARG WASM_TARGET
@@ -10,6 +10,7 @@ WORKDIR /tmp
 COPY / ./
 RUN curl -LSs "https://github.com/bytecodealliance/wasmtime/releases/download/v${WASMTIME_VERSION}/wasmtime-v${WASMTIME_VERSION}-$(uname -m)-linux.tar.xz" | \
 tar --strip-components=1 -Jx && \
+rustup default nightly && \
 rustup target add ${WASM_TARGET} && \
 cargo build --bin xitca-web-wasm --features web --release --target ${WASM_TARGET}
 
@@ -27,9 +28,8 @@ COPY --from=compile \
 /opt/xitca-web-wasm/
 EXPOSE 8080
 
-CMD /opt/xitca-web-wasm/wasmtime run /opt/xitca-web-wasm/xitca-web-wasm.wasm \
---wasm-features=threads \
---wasi-modules experimental-wasi-threads \
---allow-precompiled \
+CMD /opt/xitca-web-wasm/wasmtime run \
+--wasm all-proposals=y \
+--wasi threads=y,tcplisten=0.0.0.0:8080 \
 --env FD_COUNT=3 \
---tcplisten 0.0.0.0:8080
+/opt/xitca-web-wasm/xitca-web-wasm.wasm
