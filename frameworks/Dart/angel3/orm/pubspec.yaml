@@ -23,6 +23,7 @@ dependencies:
   optional: ^6.0.0
   logging: ^1.3.0
   angel3_container: ^8.3.0
+  file: ^7.0.1
 
 dev_dependencies:
   angel3_hot: ^8.3.0
