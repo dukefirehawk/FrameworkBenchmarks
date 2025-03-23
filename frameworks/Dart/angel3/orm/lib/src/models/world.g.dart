@@ -11,7 +11,7 @@ class WorldMigration extends Migration {
   void up(Schema schema) {
     schema.create('world', (table) {
       table.integer('id');
-      table.integer('random_number');
+      table.integer('randomNumber');
     });
   }
 
@@ -56,7 +56,7 @@ class WorldQuery extends Query<World, WorldQueryWhere> {
   List<String> get fields {
     const _fields = [
       'id',
-      'random_number',
+      'randomNumber',
     ];
     return _selectedFields.isEmpty
         ? _fields
@@ -84,7 +84,7 @@ class WorldQuery extends Query<World, WorldQueryWhere> {
     }
     var model = World(
       id: fields.contains('id') ? mapToInt(row[0]) : null,
-      randomNumber: fields.contains('random_number') ? mapToInt(row[1]) : null,
+      randomNumber: fields.contains('randomNumber') ? mapToInt(row[1]) : null,
     );
     return Optional.of(model);
   }
@@ -103,7 +103,7 @@ class WorldQueryWhere extends QueryWhere {
         ),
         randomNumber = NumericSqlExpressionBuilder<int>(
           query,
-          'random_number',
+          'randomNumber',
         );
 
   final NumericSqlExpressionBuilder<int> id;
@@ -132,10 +132,10 @@ class WorldQueryValues extends MapQueryValues {
   set id(int? value) => values['id'] = value;
 
   int? get randomNumber {
-    return (values['random_number'] as int?);
+    return (values['randomNumber'] as int?);
   }
 
-  set randomNumber(int? value) => values['random_number'] = value;
+  set randomNumber(int? value) => values['randomNumber'] = value;
 
   void copyFrom(World model) {
     id = model.id;
@@ -224,14 +224,14 @@ class WorldSerializer extends Codec<World, Map> {
 
   static World fromMap(Map map) {
     return World(
-        id: map['id'] as int?, randomNumber: map['random_number'] as int?);
+        id: map['id'] as int?, randomNumber: map['randomNumber'] as int?);
   }
 
   static Map<String, dynamic> toMap(_World? model) {
     if (model == null) {
       throw FormatException("Required field [model] cannot be null");
     }
-    return {'id': model.id, 'random_number': model.randomNumber};
+    return {'id': model.id, 'randomNumber': model.randomNumber};
   }
 }
 
@@ -243,5 +243,5 @@ abstract class WorldFields {
 
   static const String id = 'id';
 
-  static const String randomNumber = 'random_number';
+  static const String randomNumber = 'randomNumber';
 }
